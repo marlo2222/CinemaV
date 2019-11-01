@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns:th="www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Cadastrar Filme</title>
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+</head>
+<body>
+	<div th:replace="fragmentos/fragmentos :: cabecalho"></div>
+	
+	<div class="container">
+		<h3>inserção de novo filme</h3>
+		<form class="form-horizontal " action="/cadastro/filme" method="post" name="filme">
+			<div class="row">
+				<div class="form-group col-md-6">
+					<label>Titulo</label> 
+					<input type="text" class="form-control"  name="nomeFilme">
+				</div>
+			</div>
+			<div class="row">
+				<div class="form-group col-md-6">
+					<label>Data estreia</label> 
+					<input type="date" class="form-control" name="dataEstreia">
+				</div>
+			</div>
+			<div class="row">
+				<div class="form-group col-md-6">
+					<select class="custom-select" name="tipoSala">
+  						<option selected>tipo de sala</option>
+    					<option  value="1">Imax</option>
+    					<option  value="2">Normal 1</option>
+    					<option  value="3">Normal 2</option>
+    					</option>
+					</select>
+				</div>
+			</div>
+			<div class="row">
+				<div class="form-group col-md-6">
+					<label>Horario Exibição</label> 
+						<input type="time" id="appt" required name="horarioExibicao">
+						<small>Escolhe um horario de ixibição ai doido</small>
+				</div>
+			</div>
+			<div class="row">
+				<div class="form-group col-md-6">
+					<label>duraçao</label> 
+						<input type="time" id="appt" required name ="duracao">
+						<small>escolhe uma duração ai doido</small>
+				</div>
+			</div>
+			<button type="submit" class="btn btn-success">Salvar!</button>
+			<a href="/" class="btn btn-danger">cancelar</a>
+		</form>
+	</div>
+
+	<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+		
+</body>
+</html>
