@@ -42,12 +42,31 @@ public class HomeController {
 	@PostMapping("/cadastro/filme")
 	public ModelAndView cadastrarFilme(@RequestParam("nomeFilme") String nomeFilme, @RequestParam("dataEstreia") String dataEstreia, 
 		@RequestParam("tipoSala") int sala, @RequestParam("horarioExibicao") String horarioExibicao, @RequestParam("duracao") String duracao){
+		ModelAndView mv = new ModelAndView();
 		
 		
 		String rep = filmeService.salvarFilme(nomeFilme,dataEstreia,sala,horarioExibicao,duracao);
 		System.out.println(rep);
+		String err = "danger";
+		
+		if (!rep.isEmpty()){
+			mv.addObject("err", err);
+		} else {
+			rep = "Cadastrado com sucesso!";
+		}
+		
+		
+		mv.addObject("menssagem", rep);	
+		mv.setViewName("home/filme");
+		return mv;
+		
+		
+	}
+	
+	@GetMapping("/venda/ingresso")
+	public ModelAndView venderTicked() {
 		ModelAndView mv = new ModelAndView();
-		mv.setViewName("redirect:/");
+		mv.setViewName("home/venda");
 		return mv;
 	}
 	

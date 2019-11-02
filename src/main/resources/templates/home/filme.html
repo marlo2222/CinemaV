@@ -10,6 +10,12 @@
 	
 	<div class="container">
 		<h3>inserção de novo filme</h3>
+		
+		<div class="row" th:if="${menssagem != ''}">
+			<div class="alert" th:classappend="${err} ?  alert-danger: alert-success" role="alert" th:text="${menssagem}"></div>
+		</div>
+		
+		<!-- <h3 th:text = "${menssagem}"></h3> -->
 		<form class="form-horizontal " action="/cadastro/filme" method="post" name="filme">
 			<div class="row">
 				<div class="form-group col-md-6">
@@ -26,7 +32,6 @@
 			<div class="row">
 				<div class="form-group col-md-6">
 					<select class="custom-select" name="tipoSala">
-  						<option selected>tipo de sala</option>
     					<option  value="1">Imax</option>
     					<option  value="2">Normal 1</option>
     					<option  value="3">Normal 2</option>

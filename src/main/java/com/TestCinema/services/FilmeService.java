@@ -36,7 +36,6 @@ public class FilmeService {
 		LocalTime duracaoFilme = LocalTime.parse(duracao);
 		
 		LocalDate criacao = LocalDate.now();
-		
 		Filme filme = new Filme(nomeFilme, data, duracaoFilme);
 		
 		Sessao sessao = new Sessao(exibicao, sala);
@@ -60,7 +59,7 @@ public class FilmeService {
 		filmeRepository.save(filme);
 		sessaoRepository.save(sessao);
 
-		return ":)";
+		return "";
 	}
 	
 	
