@@ -56,8 +56,8 @@ public class FilmeService {
 			return "não cadastrado: A5";
 		}
 		
-		filmeRepository.save(filme);
-		sessaoRepository.save(sessao);
+//		filmeRepository.save(filme);
+//		sessaoRepository.save(sessao);
 
 		return "";
 	}
