@@ -15,6 +15,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -27,7 +28,7 @@ public class Filme {
 	@Column
 	private long id;
 	
-	@Column(name="nomeFilme")
+	@Column(name="nomeFilme", unique = true)
 	private String nomeFilme;
 	
 	@Column(name = "data_estreia")

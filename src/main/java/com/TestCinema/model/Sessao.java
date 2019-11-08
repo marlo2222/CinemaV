@@ -1,5 +1,6 @@
 package com.TestCinema.model;
 
+import java.time.LocalDate;
 import java.time.LocalTime;
 
 import javax.persistence.Column;
@@ -11,6 +12,8 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+
+import org.springframework.format.annotation.DateTimeFormat;
 
 @Entity
 @Table(name = "Sessao")
@@ -36,13 +39,15 @@ public class Sessao {
 	@Column(name = "tipoSala")
 	private long tipoSala;
 	
-	public Sessao() {
-		
-	}
+	@Column(name = "data")
+	@DateTimeFormat(pattern = "dd/MM/yyyy")
+	private LocalDate data;
 	
-	public Sessao(LocalTime exibicao, int sala) {
+		
+	public Sessao(LocalTime exibicao, long sala, LocalDate data) {
 		this.horarioExibicao = exibicao;
 		this.tipoSala = sala;
+		this.data = data;
 		this.capacidade = this.tipoSala == 1 ? 100 : 50; 
 	}
 
@@ -92,5 +97,16 @@ public class Sessao {
 
 	public void setTipoSala(long tipoSala) {
 		this.tipoSala = tipoSala;
+	}
+	public LocalDate getData() {
+		return data;
+	}
+
+	public void setData(LocalDate data) {
+		this.data = data;
+	}
+
+	public Sessao() {
+		
 	}
 }

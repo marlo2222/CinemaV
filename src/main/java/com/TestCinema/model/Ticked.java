@@ -16,7 +16,7 @@ public class Ticked {
 	@Column(name = "id")
 	private long id;
 	
-	private Sessao sessao;
+	//private Sessao sessao;
 	
 	private long poltrona;
 

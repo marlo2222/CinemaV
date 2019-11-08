@@ -23,72 +23,139 @@ public class FilmeService {
 	@Autowired
 	SessaoRepository sessaoRepository;
 	
+	public List<Filme> filmes() {
+		return filmeRepository.findAll();
+	}
+	
 	
 
-	public String salvarFilme(String nomeFilme, String dataEstreia, int sala, String horarioExibicao, String duracao) {
+	public Filme salvarFilme(String nomeFilme, String dataEstreia, String duracao) {
 		
-		if (!validarEntradas(nomeFilme, dataEstreia, sala, horarioExibicao, duracao)) {
-			return "não cadastrado: A6";
+		if (!validarEntradasFilme(nomeFilme, dataEstreia, duracao)) {
+			System.out.println("entradas filme invalida");
+			return null;
 		}
 		
 		LocalDate data = LocalDate.parse(dataEstreia);
-		LocalTime exibicao = LocalTime.parse(horarioExibicao);
+		
 		LocalTime duracaoFilme = LocalTime.parse(duracao);
 		
 		LocalDate criacao = LocalDate.now();
 		Filme filme = new Filme(nomeFilme, data, duracaoFilme);
 		
-		Sessao sessao = new Sessao(exibicao, sala);
+		Filme filmeAux = filmeRepository.findByNomeFilme(nomeFilme);
 		
-		sessao.setFilme(filme);
+		if (filmeAux != null) {
+			System.out.println("já existe esse filme amigo");
+			return null;
+		}
 		
 		if(!(filme.getDataEstreia().plusDays(-7).isBefore(criacao))) {
-			return "não cadastrado: A1";
+			System.out.println("passou de 7 dias");
+			return null;
 		}
 		
 		if(!filme.getDataEstreia().getDayOfWeek().equals(DayOfWeek.THURSDAY)) {
-			return "não cadastrado: A2";
+			System.out.println("precisa estreiar em uma quinta");
+			return null;
 		}
+		
+		
+		filmeRepository.save(filme);
+
+
+		return filme;
+	}
+	public Sessao salvarSessao(long idFilme, String horarioExibicao, long tipoSala, String dataExibicao) {
+		if (!validarEntradasSessao(idFilme, horarioExibicao, tipoSala, dataExibicao)) {
+			System.out.println("entradas sessao invalida");
+			return null;
+		}
+		Filme filme = filmeRepository.getOne(idFilme);
+		
+		LocalTime exibicao = LocalTime.parse(horarioExibicao);
+		LocalDate data = LocalDate.parse(dataExibicao);
+		LocalDate criacao = LocalDate.now();
+	
+		Sessao sessao = new Sessao(exibicao, tipoSala, data);
+		
+		sessao.setFilme(filme);
+		
 		if (!(exibicao.isBefore(LocalTime.of(22, 01)) && exibicao.isAfter(LocalTime.of(11, 59)))){
-			return "não cadastrado: A3";
+			System.out.println("nao pode ser depois das 22 antes da 12");
+			return null;
+		}
+		if (data.isBefore(criacao)) {
+			System.out.println("nao pode ser data no passado amigo");
+			return null;
 		}
 		if(sessaoJaExistente(filme, sessao)) {
-			return "não cadastrado: A5";
+			System.out.println("sessao ja existentes");
+			return null;
 		}
 		
-//		filmeRepository.save(filme);
-//		sessaoRepository.save(sessao);
-
-		return "";
+		sessaoRepository.save(sessao);
+		
+		return sessao;
 	}
 	
 	
 
-	private boolean validarEntradas(String nomeFilme, String dataEstreia, int sala, String horarioExibicao, String duracao) {
-		if (nomeFilme.isEmpty() || dataEstreia.isEmpty() || horarioExibicao.isEmpty() || duracao.isEmpty())
+	private boolean validarEntradasFilme(String nomeFilme, String dataEstreia, String duracao) {
+		if(nomeFilme == null || dataEstreia == null || duracao == null)
 			return false;
-		if(sala == 0)
+		if (nomeFilme.isEmpty() || dataEstreia.isEmpty() || duracao.isEmpty())
 			return false;
+	
 		return true;
+	
+	}
+	private boolean validarEntradasSessao(long idFilme, String horarioExibicao, long tipoSala, String data) {
+		
+		if(idFilme <= 0 || horarioExibicao == null || tipoSala <= 0 || data == null)
+			return false;
+		if (horarioExibicao.isEmpty() || data.isEmpty())
+			return false;
+		if (!filmeRepository.existsById(idFilme))
+			return false;
+	
+		return true;
+	
 	}
 
-	public boolean sessaoJaExistente(Filme filme, Sessao sessao){
+	public boolean sessaoJaExistente(Filme filme, Sessao novaSessao){
 		
-		List<Filme> filmes = filmeRepository.findByDataEstreia(filme.getDataEstreia());
+		//List<Filme> filmes = filmeRepository.findByDataEstreia(filme.getDataEstreia());
+		List<Sessao> sessoes = sessaoRepository.findByDataAndTipoSala(novaSessao.getData(), novaSessao.getTipoSala());
+		if(sessoes == null) {
+			System.out.println("NULLLLLLLLL");
+		}else {
+			System.out.println("OKKKKKKKKKK");			
+		}
+
+		LocalTime termino = novaSessao.getHorarioExibicao().plusSeconds(novaSessao.getFilme().getDuracao().toSecondOfDay());
 		
-		for (Filme f : filmes){
-			List<Sessao> sessoes = sessaoRepository.findByTipoSalaAndFilme(sessao.getTipoSala(),f);
-			for (Sessao s : sessoes) {
+	
+		for (Sessao s : sessoes) {	
 			
-				LocalTime termino = sessao.getHorarioExibicao().plusSeconds(f.getDuracao().toSecondOfDay());
-				if(s.getHorarioExibicao().equals(sessao.getHorarioExibicao()) || s.getHorarioExibicao().equals(termino)) {
-					return true;
-				}
-				if(s.getHorarioExibicao().isAfter(sessao.getHorarioExibicao()) && s.getHorarioExibicao().isBefore(termino)) {
-					return true;
-				}
+			LocalTime terminoS = s.getHorarioExibicao().plusSeconds(s.getFilme().getDuracao().toSecondOfDay());
+			
+			if(s.getHorarioExibicao().equals(novaSessao.getHorarioExibicao()) || s.getHorarioExibicao().equals(termino)) {
+				System.out.println("examente iguais ou inicio ou termino");
+				return true;
+			}
+			
+			if(s.getHorarioExibicao().isBefore(termino) && s.getHorarioExibicao().isBefore(novaSessao.getHorarioExibicao())) {
+				System.out.println("esta entre os intervalos 1");
+				return true;
+			}
+			
+			if(termino.isBefore(terminoS) && termino.isAfter(novaSessao.getHorarioExibicao())) {
+				System.out.println("esta entre os intervalos 2");
+				return true;
 			}
 		}
+		
 		
 		return false;
 	}

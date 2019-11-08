@@ -12,5 +12,7 @@ import com.TestCinema.model.Filme;
 public interface FilmeRepository extends JpaRepository<Filme, Long>{
 	
 	List<Filme> findByDataEstreia(LocalDate data);
+	
+	Filme findByNomeFilme(String nomeFilme);
 
 }

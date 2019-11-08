@@ -35,6 +35,7 @@ public class HomeController {
 	public ModelAndView cadastrarFilme(){
 		ModelAndView mv = new ModelAndView();
 		mv.addObject("filme", new Filme());
+		
 		mv.setViewName("home/filme");
 		return mv;
 	}
@@ -45,21 +46,52 @@ public class HomeController {
 		ModelAndView mv = new ModelAndView();
 		
 		
-		String rep = filmeService.salvarFilme(nomeFilme,dataEstreia,sala,horarioExibicao,duracao);
-		System.out.println(rep);
+		Filme filme = filmeService.salvarFilme(nomeFilme,dataEstreia,duracao);
+		
 		String err = "danger";
 		
-		if (!rep.isEmpty()){
+		if (filme == null){
 			mv.addObject("err", err);
+			mv.addObject("menssagem", "filme não cadastrado");
 		} else {
-			rep = "Cadastrado com sucesso!";
+			Sessao sessao = filmeService.salvarSessao(filme.getId(), horarioExibicao, sala, dataEstreia);
+			if(sessao == null) {
+				mv.addObject("err", err);
+				mv.addObject("menssagem", "filme não cadastrado");
+			}else {
+				
+				mv.addObject("menssagem", "filme cadastrado com sucesso");
+			}
+			
 		}
-		
-		
-		mv.addObject("menssagem", rep);	
+
 		mv.setViewName("home/filme");
 		return mv;
 		
+		
+	}
+	@GetMapping("/cadastra/novaSecao")
+	public ModelAndView cadastraNovaSecao() {
+		ModelAndView mv = new ModelAndView();
+		mv.addObject("filmes", filmeService.filmes());
+		mv.addObject("secao", new Sessao());
+		mv.setViewName("home/secao");
+		return mv;
+	}
+	@PostMapping("/cadastra/novaSecao")
+	public ModelAndView cadastraNovaSecao(@RequestParam("filme") long id,@RequestParam("horarioExibicao") String horarioExibicao, @RequestParam("tipoSala") long tipoSala,@RequestParam("data") String data){
+		ModelAndView mv = new ModelAndView();
+		Sessao sessao = filmeService.salvarSessao(id, horarioExibicao, tipoSala, data);
+		String err = "danger";
+		if(sessao == null) {
+			mv.addObject("err", err);
+			mv.addObject("menssagem", "sessao não cadastrado");
+		}else {
+			
+			mv.addObject("menssagem", "sessao cadastrado com sucesso");
+		}
+		mv.setViewName("home/secao");
+		return mv;
 		
 	}
 	
