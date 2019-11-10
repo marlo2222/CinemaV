@@ -98,8 +98,6 @@ public class FilmeService {
 		
 		return sessao;
 	}
-	
-	
 
 	private boolean validarEntradasFilme(String nomeFilme, String dataEstreia, String duracao) {
 		if(nomeFilme == null || dataEstreia == null || duracao == null)
@@ -125,7 +123,6 @@ public class FilmeService {
 
 	public boolean sessaoJaExistente(Filme filme, Sessao novaSessao){
 		
-		//List<Filme> filmes = filmeRepository.findByDataEstreia(filme.getDataEstreia());
 		List<Sessao> sessoes = sessaoRepository.findByDataAndTipoSala(novaSessao.getData(), novaSessao.getTipoSala());
 		if(sessoes == null) {
 			System.out.println("NULLLLLLLLL");
@@ -155,7 +152,6 @@ public class FilmeService {
 				return true;
 			}
 		}
-		
 		
 		return false;
 	}
