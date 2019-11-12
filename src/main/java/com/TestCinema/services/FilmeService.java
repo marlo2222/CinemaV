@@ -3,10 +3,9 @@ package com.TestCinema.services;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.HashMap;
 import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import java.util.Map;
 
 import com.TestCinema.model.Filme;
 import com.TestCinema.model.Sessao;
@@ -15,12 +14,17 @@ import com.TestCinema.repository.FilmeRepository;
 import com.TestCinema.repository.SessaoRepository;
 import com.TestCinema.repository.TicketRepository;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.ExampleMatcher.NoOpPropertyValueTransformer;
+import org.springframework.stereotype.Service;
+
 @Service
 public class FilmeService {
 
 	private long TICKET_TIPO_INTEIRO = 0;
 	private long TICKET_TIPO_MEIO = 1;
-
+	
+	private long SALA_IMAX = 1;
 	
 	@Autowired
 	FilmeRepository filmeRepository;
@@ -44,11 +48,38 @@ public class FilmeService {
 	}
 
 	public List<Sessao> sessoes(long filmeId) {
-		return sessaoRepository.findAll();
+		Filme filme = filmeRepository.findById(filmeId).get();
+		
+		return filme.getSessoes();
 	}
 
-	public long[] poltronasLivres(long sessaoId) {
-		return new long[]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+	public double precoTicket(long sessaoId){
+		Sessao sessao = sessaoRepository.getOne(sessaoId);
+		double preco;
+		
+		if(sessao.getTipoSala() == SALA_IMAX){
+			preco = 100;
+		} else {
+			preco = 50;
+		}
+		return preco;
+	}
+
+	public Map<Object, Object> poltronasLivres(long sessaoId) {
+		Sessao sessao = sessaoRepository.getOne(sessaoId);
+		
+		List<Ticket> vendidos = ticketRepository.findBySessao(sessao);
+		
+		Map<Object, Object> poltronasLivres = new HashMap<>();
+
+		for(Integer i=1; i <= sessao.getCapacidade(); i++){
+			poltronasLivres.put(i, true);
+		}
+		
+		for (Ticket ticket : vendidos) {
+			poltronasLivres.put(ticket.getPoltrona(), false);
+		}
+		return poltronasLivres;
 	}
 
 
@@ -124,17 +155,33 @@ public class FilmeService {
 		return sessao;
 	}
 	
+	public boolean poltronaLivre(long sessaoId, long poltrona) {
+		Sessao sessao = sessaoRepository.getOne(sessaoId);
+		Ticket ticket = ticketRepository.findBySessaoAndPoltrona(sessao, poltrona);
+		if (ticket != null){
+			return false;
+		}
+		return true;
+	}
+
 	public 	Ticket venderTicket(long filmeId, long sessaoId, long poltrona, long tipoTicket) {
-		// if(!validarEntradasTicket(filmeId, sessaoId, tipoTicket)) {
-		// 	System.out.println("entradas ticket invalida");
-		// 	return null;
+		if(!validarEntradasTicket(filmeId, sessaoId, poltrona, tipoTicket)) {
+			System.out.println("entradas ticket invalida");
+			return null;
+		}
+		
+		if(!poltronaLivre(sessaoId, poltrona)) {
+			System.out.println("poltrona ocupada");
+			return null;
+		}
+
+		// // poltronas proximas vazias
+		// if() {
+			
 		// }
 
-		System.out.println("----------- Venda");
-		System.out.println("filmeID" + filmeId);
-		System.out.println("SessaoID" + sessaoId);
-		System.out.println("Poltrona" + poltrona);
-		System.out.println("Tipo" + tipoTicket);
+		Ticket novoTicket = new Ticket(sessao(sessaoId), poltrona);
+		ticketRepository.save(novoTicket);
 		return null;
 	}
 
@@ -161,8 +208,8 @@ public class FilmeService {
 	
 	}
 
-	private boolean validarEntradasTicket(long filmeId, long sessaoId, long tipoTicket) {
-		if(filmeId == 0 || sessaoId == 0 || tipoTicket == 0) {
+	private boolean validarEntradasTicket(long filmeId, long sessaoId, long poltrona, long tipoTicket) {
+		if(filmeId == 0 || poltrona == 0 || sessaoId == 0 || tipoTicket == 0) {
 			return false;
 		}
 		return true;

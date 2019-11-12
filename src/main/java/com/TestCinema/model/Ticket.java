@@ -26,4 +26,37 @@ public class Ticket {
 	
 	@Column(name = "poltrona")
 	private long poltrona;
+
+
+	public Ticket(Sessao sessao, long poltrona) {
+		this.sessao = sessao;
+		this.poltrona = poltrona;
+	}
+
+
+	public long getId() {
+		return id;
+	}
+
+	public void setId(long id) {
+		this.id = id;
+	}
+
+	public Sessao getSessao() {
+		return sessao;
+	}
+
+	public void setSessao(Sessao sessao) {
+		this.sessao = sessao;
+	}
+
+	public long getPoltrona() {
+		return poltrona;
+	}
+
+	public void setPoltrona(long poltrona) {
+		this.poltrona = poltrona;
+	}
+
+	
 }

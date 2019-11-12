@@ -46,15 +46,15 @@
 				<div class="form-group col-md-6">
 					<label>Poltrona</label> 
 					<select class="custom-select" name="poltrona">
-						<option th:each="poltrona : ${poltronas}" th:value="${poltrona}" th:text="${poltrona}"></option>
+						<option th:each="poltrona : ${poltronas}" th:if="${poltrona.value}" th:value="${poltrona.key}" th:text="${poltrona.key}"></option>
 					</select>
 				</div>
 			</div>
 			<div class="row">
 				<div class="form-group col-md-6">
 					<select class="custom-select" name="tipo">
-						<option  value="0" > Inteira </option>
-						<option  value="1" >Meia</option>
+						<option  value="0" th:text="'Inteira - R$ ' + ${preco}"></option>
+						<option  value="1" th:text="'Meia- R$ ' + ${preco/2}"></option>
 						</option>
 					</select>
 				</div>

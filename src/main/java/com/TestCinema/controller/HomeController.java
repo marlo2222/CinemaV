@@ -84,8 +84,7 @@ public class HomeController {
 		if(sessao == null) {
 			mv.addObject("err", err);
 			mv.addObject("menssagem", "sessao não cadastrado");
-		}else {
-			
+		} else {
 			mv.addObject("menssagem", "sessao cadastrado com sucesso");
 		}
 		mv.setViewName("home/secao");
@@ -121,6 +120,7 @@ public class HomeController {
 
 		mv.addObject("filme", filmeService.filme(filmeId));
 		mv.addObject("sessao", filmeService.sessao(sessaoId));
+		mv.addObject("preco", filmeService.precoTicket(sessaoId));
 		mv.addObject("poltronas", filmeService.poltronasLivres(sessaoId));
 		mv.setViewName("home/ticket-poltrona");
 		return mv;
@@ -135,9 +135,15 @@ public class HomeController {
 
 		ModelAndView mv = new ModelAndView();
 		
-		filmeService.venderTicket(filmeId, sessaoId, poltrona, tipoTicket);
-
-		// mv.addObject("menssagem", "Ticket ok!");
+		Ticket novoTicket = filmeService.venderTicket(filmeId, sessaoId, poltrona, tipoTicket);
+		String err = "danger";
+		
+		if(novoTicket == null) {
+			mv.addObject("err", err);
+			mv.addObject("menssagem", "Erro ao efetuar venda.");
+		} else {
+			mv.addObject("menssagem", "Venda realizada com sucesso!");
+		}
 		mv.setViewName("home/ticket-filme");
 		return mv;
 	}
