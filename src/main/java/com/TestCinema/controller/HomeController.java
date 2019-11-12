@@ -2,20 +2,14 @@ package com.TestCinema.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
-
-import javax.validation.Valid;
-
 import com.TestCinema.model.Filme;
 import com.TestCinema.model.Sessao;
+import com.TestCinema.model.Ticket;
 import com.TestCinema.services.FilmeService;
 
 @Controller
@@ -58,18 +52,15 @@ public class HomeController {
 			if(sessao == null) {
 				mv.addObject("err", err);
 				mv.addObject("menssagem", "filme não cadastrado");
-			}else {
-				
+			} else {
 				mv.addObject("menssagem", "filme cadastrado com sucesso");
 			}
-			
 		}
 
 		mv.setViewName("home/filme");
 		return mv;
-		
-		
 	}
+	
 	@GetMapping("/cadastra/novaSecao")
 	public ModelAndView cadastraNovaSecao() {
 		ModelAndView mv = new ModelAndView();
@@ -78,10 +69,17 @@ public class HomeController {
 		mv.setViewName("home/secao");
 		return mv;
 	}
+	
 	@PostMapping("/cadastra/novaSecao")
-	public ModelAndView cadastraNovaSecao(@RequestParam("filme") long id,@RequestParam("horarioExibicao") String horarioExibicao, @RequestParam("tipoSala") long tipoSala,@RequestParam("data") String data){
+	public ModelAndView cadastraNovaSecao(
+		@RequestParam("filme") long id,
+		@RequestParam("horarioExibicao") String horarioExibicao,
+		@RequestParam("tipoSala") long tipoSala,
+		@RequestParam("data") String data){
+
 		ModelAndView mv = new ModelAndView();
 		Sessao sessao = filmeService.salvarSessao(id, horarioExibicao, tipoSala, data);
+		
 		String err = "danger";
 		if(sessao == null) {
 			mv.addObject("err", err);
@@ -91,16 +89,56 @@ public class HomeController {
 			mv.addObject("menssagem", "sessao cadastrado com sucesso");
 		}
 		mv.setViewName("home/secao");
-		return mv;
-		
+		return mv;		
 	}
 	
-	@GetMapping("/venda/ingresso")
-	public ModelAndView venderTicked() {
+	@GetMapping("/venda/ticket")
+	public ModelAndView venderTicket() {
 		ModelAndView mv = new ModelAndView();
-		mv.setViewName("home/venda");
-		return mv;
+		mv.addObject("filmes", filmeService.filmes());
+		mv.setViewName("home/ticket-filme");
+		return mv;	
 	}
 	
+	@PostMapping("/venda/ticket/sessao")
+	public ModelAndView venderTicket(
+		@RequestParam("filme") long filmeId) {
+		
+		ModelAndView mv = new ModelAndView();
+
+		mv.addObject("filme", filmeService.filme(filmeId));
+		mv.addObject("sessoes", filmeService.sessoes(filmeId));
+		mv.setViewName("home/ticket-sessao");
+		return mv;
+	}
+
+	@PostMapping("/venda/ticket/poltrona")
+	public ModelAndView venderTicket(
+		@RequestParam("filme") long filmeId,
+		@RequestParam("sessao") long sessaoId) {
 	
+		ModelAndView mv = new ModelAndView();
+
+		mv.addObject("filme", filmeService.filme(filmeId));
+		mv.addObject("sessao", filmeService.sessao(sessaoId));
+		mv.addObject("poltronas", filmeService.poltronasLivres(sessaoId));
+		mv.setViewName("home/ticket-poltrona");
+		return mv;
+	}
+
+	@PostMapping("/venda/ticket")
+	public ModelAndView venderTicket(
+		@RequestParam("filme") long filmeId, 
+		@RequestParam("sessao") long sessaoId,
+		@RequestParam("poltrona") long poltrona,
+		@RequestParam("tipo") long tipoTicket) {
+
+		ModelAndView mv = new ModelAndView();
+		
+		filmeService.venderTicket(filmeId, sessaoId, poltrona, tipoTicket);
+
+		// mv.addObject("menssagem", "Ticket ok!");
+		mv.setViewName("home/ticket-filme");
+		return mv;
+	}
 }

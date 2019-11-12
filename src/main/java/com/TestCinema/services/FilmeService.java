@@ -7,27 +7,51 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.validation.BindingResult;
 
 import com.TestCinema.model.Filme;
 import com.TestCinema.model.Sessao;
+import com.TestCinema.model.Ticket;
 import com.TestCinema.repository.FilmeRepository;
 import com.TestCinema.repository.SessaoRepository;
+import com.TestCinema.repository.TicketRepository;
 
 @Service
 public class FilmeService {
+
+	private long TICKET_TIPO_INTEIRO = 0;
+	private long TICKET_TIPO_MEIO = 1;
+
 	
 	@Autowired
 	FilmeRepository filmeRepository;
 	
 	@Autowired
 	SessaoRepository sessaoRepository;
+
+	@Autowired
+	TicketRepository ticketRepository;
 	
 	public List<Filme> filmes() {
 		return filmeRepository.findAll();
 	}
+
+	public Filme filme(long filmeId) {
+		return filmeRepository.findById(filmeId).get();
+	}
 	
-	
+	public Sessao sessao(long sessaoId) {
+		return sessaoRepository.findById(sessaoId).get();
+	}
+
+	public List<Sessao> sessoes(long filmeId) {
+		return sessaoRepository.findAll();
+	}
+
+	public long[] poltronasLivres(long sessaoId) {
+		return new long[]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+	}
+
+
 
 	public Filme salvarFilme(String nomeFilme, String dataEstreia, String duracao) {
 		
@@ -66,6 +90,7 @@ public class FilmeService {
 
 		return filme;
 	}
+	
 	public Sessao salvarSessao(long idFilme, String horarioExibicao, long tipoSala, String dataExibicao) {
 		if (!validarEntradasSessao(idFilme, horarioExibicao, tipoSala, dataExibicao)) {
 			System.out.println("entradas sessao invalida");
@@ -99,7 +124,19 @@ public class FilmeService {
 		return sessao;
 	}
 	
-	
+	public 	Ticket venderTicket(long filmeId, long sessaoId, long poltrona, long tipoTicket) {
+		// if(!validarEntradasTicket(filmeId, sessaoId, tipoTicket)) {
+		// 	System.out.println("entradas ticket invalida");
+		// 	return null;
+		// }
+
+		System.out.println("----------- Venda");
+		System.out.println("filmeID" + filmeId);
+		System.out.println("SessaoID" + sessaoId);
+		System.out.println("Poltrona" + poltrona);
+		System.out.println("Tipo" + tipoTicket);
+		return null;
+	}
 
 	private boolean validarEntradasFilme(String nomeFilme, String dataEstreia, String duracao) {
 		if(nomeFilme == null || dataEstreia == null || duracao == null)
@@ -110,8 +147,9 @@ public class FilmeService {
 		return true;
 	
 	}
+	
 	private boolean validarEntradasSessao(long idFilme, String horarioExibicao, long tipoSala, String data) {
-		
+
 		if(idFilme <= 0 || horarioExibicao == null || tipoSala <= 0 || data == null)
 			return false;
 		if (horarioExibicao.isEmpty() || data.isEmpty())
@@ -123,9 +161,14 @@ public class FilmeService {
 	
 	}
 
-	public boolean sessaoJaExistente(Filme filme, Sessao novaSessao){
-		
-		//List<Filme> filmes = filmeRepository.findByDataEstreia(filme.getDataEstreia());
+	private boolean validarEntradasTicket(long filmeId, long sessaoId, long tipoTicket) {
+		if(filmeId == 0 || sessaoId == 0 || tipoTicket == 0) {
+			return false;
+		}
+		return true;
+	}
+
+	public boolean sessaoJaExistente(Filme filme, Sessao novaSessao) {
 		List<Sessao> sessoes = sessaoRepository.findByDataAndTipoSala(novaSessao.getData(), novaSessao.getTipoSala());
 		if(sessoes == null) {
 			System.out.println("NULLLLLLLLL");
@@ -134,10 +177,8 @@ public class FilmeService {
 		}
 
 		LocalTime termino = novaSessao.getHorarioExibicao().plusSeconds(novaSessao.getFilme().getDuracao().toSecondOfDay());
-		
 	
 		for (Sessao s : sessoes) {	
-			
 			LocalTime terminoS = s.getHorarioExibicao().plusSeconds(s.getFilme().getDuracao().toSecondOfDay());
 			
 			if(s.getHorarioExibicao().equals(novaSessao.getHorarioExibicao()) || s.getHorarioExibicao().equals(termino)) {
@@ -159,4 +200,6 @@ public class FilmeService {
 		
 		return false;
 	}
+
+	
 }
