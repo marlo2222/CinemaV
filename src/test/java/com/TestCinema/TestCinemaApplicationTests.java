@@ -21,8 +21,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import com.TestCinema.model.Filme;
 import com.TestCinema.model.Sessao;
+import com.TestCinema.model.Ticket;
 import com.TestCinema.repository.FilmeRepository;
 import com.TestCinema.repository.SessaoRepository;
+import com.TestCinema.repository.TicketRepository;
 import com.TestCinema.services.FilmeService;
 
 @SpringBootTest
@@ -34,6 +36,9 @@ class TestCinemaApplicationTests {
 
 	@Mock
 	private SessaoRepository sr;
+	
+	@Mock
+	private TicketRepository tr;
 
 	@Test
 	void contextLoads() {
@@ -65,6 +70,15 @@ class TestCinemaApplicationTests {
 		sessao.setFilme(filme);
 		sr.save(sessao);
 		verify(sr).save(sessao);
+	}
+	
+	@Test
+	public void salvarTicketTest() {
+		Sessao s = new Sessao(LocalTime.of(13, 30), 1, LocalDate.of(2019, 11, 17));
+		Ticket ticket = new Ticket(s, 19);
+		
+		tr.save(ticket);
+		verify(tr).save(ticket);
 	}
 
 	@Test
@@ -201,5 +215,93 @@ class TestCinemaApplicationTests {
 
 		verify(fs).salvarSessao(1, "10:00", 1, "2019-11-14");
 		assertThat(s, is(nullValue()));
+	}
+	
+	@Test
+	public void precoTicketTest() {
+		FilmeService fs = Mockito.mock(FilmeService.class);
+		when(fs.precoTicket(1)).thenReturn((double)100);
+		when(fs.precoTicket(2)).thenReturn((double)50);
+		double precoImax = fs.precoTicket(1);
+		double precoN = fs.precoTicket(2);
+		
+		verify(fs).precoTicket(1);
+		verify(fs).precoTicket(2);
+		assertThat(precoImax, is(100.0));
+		assertThat(precoN, is(50.0));
+	}
+	
+	@Test
+	public void poltronaLivreTest() {
+		FilmeService fs = Mockito.mock(FilmeService.class);
+		when(fs.poltronaLivre(1, 19)).thenReturn(true);
+		boolean free = fs.poltronaLivre(1, 19);
+		when(fs.poltronaLivre(1, 19)).thenReturn(false);
+		boolean notFree = fs.poltronaLivre(1, 19);
+		
+		verify(fs, times(2)).poltronaLivre(1, 19);
+		assertThat(free, is(true));
+		assertThat(notFree, is(false));		
+	}
+	
+	@Test
+	public void venderTicketTest() {
+		FilmeService fs = Mockito.mock(FilmeService.class);
+		Sessao s = new Sessao(LocalTime.of(13, 30), 1, LocalDate.of(2019, 11, 17));
+		s.setId(1);
+		when(fs.venderTicket(1, 1, 19, 1)).thenReturn(new Ticket(s, 19));
+		Ticket ticket = fs.venderTicket(1, 1, 19, 1);
+		
+		verify(fs).venderTicket(1, 1, 19, 1);
+		assertThat(ticket.getPoltrona(), is((long)19));
+		assertThat(ticket.getSessao().getId(), is(s.getId()));
+	}
+	
+	@Test
+	public void venderTicketSemFilme(){
+		FilmeService fs = Mockito.mock(FilmeService.class);
+		Sessao s = new Sessao(LocalTime.of(13, 30), 1, LocalDate.of(2019, 11, 17));
+		s.setId(1);
+		when(fs.venderTicket(-1, 1, 19, 1)).thenReturn(null);
+		Ticket ticket = fs.venderTicket(-1, 1, 19, 1);
+		
+		verify(fs).venderTicket(-1, 1, 19, 1);
+		assertThat(ticket, is(nullValue()));
+	}
+	
+	@Test
+	public void venderTicketSemSessao() {
+		FilmeService fs = Mockito.mock(FilmeService.class);
+		Sessao s = new Sessao(LocalTime.of(13, 30), 1, LocalDate.of(2019, 11, 17));
+		s.setId(1);
+		when(fs.venderTicket(1, -1, 19, 1)).thenReturn(null);
+		Ticket ticket = fs.venderTicket(1, -1, 19, 1);
+		
+		verify(fs).venderTicket(1, -1, 19, 1);
+		assertThat(ticket, is(nullValue()));
+	}
+	
+	@Test
+	public void venderTicketSemPoltrona() {
+		FilmeService fs = Mockito.mock(FilmeService.class);
+		Sessao s = new Sessao(LocalTime.of(13, 30), 1, LocalDate.of(2019, 11, 17));
+		s.setId(1);
+		when(fs.venderTicket(1, 1, -1, 1)).thenReturn(null);
+		Ticket ticket = fs.venderTicket(1, 1, -1, 1);
+		
+		verify(fs).venderTicket(1, 1, -1, 1);
+		assertThat(ticket, is(nullValue()));
+	}
+	
+	@Test
+	public void venderTicketSemTipoTicket() {
+		FilmeService fs = Mockito.mock(FilmeService.class);
+		Sessao s = new Sessao(LocalTime.of(13, 30), 1, LocalDate.of(2019, 11, 17));
+		s.setId(1);
+		when(fs.venderTicket(1, 1, 19, -1)).thenReturn(null);
+		Ticket ticket = fs.venderTicket(1, 1, 19, -1);
+		
+		verify(fs).venderTicket(1, 1, 19, -1);
+		assertThat(ticket, is(nullValue()));
 	}
 }
