@@ -47,7 +47,7 @@ use ` mvn spring-boot:run` para executar sua aplicação.
 
 ## Colaboradores :busts_in_silhouette:
 
-### este projeto foi realizado juntamento com os colegas: 
+### este projeto foi realizado junto com os colegas: 
 - [Sunana Moreira](https://github.com/SusanaMCosta) :octocat:
 - [Cleiton Monteiro](https://github.com/cleitonmonteiro) :octocat:
 - [Artur Castro](https://github.com/ArturCRS) :octocat:
