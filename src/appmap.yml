@@ -1,0 +1,3 @@
+name: CinemaV
+packages:
+  - path: test.java.CinemaV
